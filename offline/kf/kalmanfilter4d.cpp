@@ -177,9 +177,10 @@ void kalmanFilter4d_predict(float dt) {
 // | zsensor_variance  0                |  
 // | 0                 asensor_variance |
 
-void kalmanFilter4d_update(float zm, float am, float* pz, float* pv) {
-	// Innovation Error y_k = measurement minus apriori estimate
-	float z_err = zm - State.z;
+        void kalmanFilter4d_update(float zm, float am, float *pz, float *pv,
+                                   float *pa) {
+        // Innovation Error y_k = measurement minus apriori estimate
+        float z_err = zm - State.z;
 	float a_err = am - State.a;
 
 	// Innovation covariance S_k
@@ -265,9 +266,14 @@ void kalmanFilter4d_update(float zm, float am, float* pz, float* pv) {
 	*pz = State.z;
 	*pv = State.v;
 
+        // Hil add
+        // pa: updated acceleration as gravity-compensated net earth-z axis acce
+        // acceleration residual bias
+        *pa = State.a - State.b;
+
 #if LOG_FILTER
 	// WARNING : this should only be enabled for offline analysis of a downloaded data log !
 	// e.g. see test code in /offline/kf 
 	printf("%.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f %.1f\n",zm, State.z, Pzz, State.v, Pvv, State.a - State.b, Paa, State.b, Pbb);
 #endif
-	}
+        }
